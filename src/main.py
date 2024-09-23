@@ -92,14 +92,14 @@ def get_total_leads_from_csv(file_path: str) -> int:
 
 def calculate_cost_per_lead(total_leads: int, total_spend: float) -> float:
     """
-    Calculate and return the cost per lead.
+    Calculate and return the cost per lead, rounded to two decimal places.
 
     :param total_leads: The number of leads generated.
     :param total_spend: The total amount of money spent.
-    :return: The cost per lead.
+    :return: The cost per lead, rounded to two decimal places.
     """
     cost_per_lead = total_spend / total_leads if total_leads != 0 else 0.0
-    return cost_per_lead
+    return round(cost_per_lead, 2)  # Round to two decimal places for currency representation
 
 
 @click.command()
