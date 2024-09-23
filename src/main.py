@@ -100,10 +100,12 @@ def calculate_cost_per_lead(total_leads: int, total_spend: float) -> float:
 
 
 @click.command()
-@click.argument("file_path", type=click.Path(exists=True))
-def main(file_path: str):
+@click.option("-c","--csv-path", type=click.Path(exists=True), required=True, help="Path to the CSV file.")
+@click.option("-s","--spend", type=float, required=True, help="Total amount of money spent.")
+def main(file_path: str, total_spend: float):
     """
-    CLI tool to process a CSV file, clean it, and calculate cost per lead. Pass in the path to the CSV file as an argument.
+    CLI tool to process a CSV file, clean it, and calculate cost per lead. 
+    Use the --file-path flag to specify the path to the CSV file and the --total-spend flag to specify the total spend amount.
     """
     try:
         # Clean the CSV file by removing test entries and deduping, and get the path to the cleaned file
@@ -112,9 +114,6 @@ def main(file_path: str):
         # Get the total number of leads from the cleaned CSV file
         total_leads: int = get_total_leads_from_csv(cleaned_file_path)
         click.echo(f"Total Leads from cleaned file: {total_leads}")
-
-        # Define the total spend amount
-        total_spend: float = 911.26
 
         # Calculate the cost per lead
         cost_per_lead: float = calculate_cost_per_lead(total_leads, total_spend)
