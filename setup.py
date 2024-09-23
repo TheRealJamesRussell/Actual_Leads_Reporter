@@ -12,7 +12,7 @@ setup(
         ],
     },
     install_requires=[
-        "click",  # Add Click as a project dependency
+        "click>=8.1.7,<9.0.0",  # Add Click as a project dependency with a version range
     ],
     extras_require={
         "dev": [
