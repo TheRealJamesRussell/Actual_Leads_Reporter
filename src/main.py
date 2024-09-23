@@ -116,7 +116,6 @@ def main(csv_path: str, spend: float):
 
         # Get the total number of leads from the cleaned CSV file
         total_leads: int = get_total_leads_from_csv(cleaned_file_path)
-        click.echo(f"Total Leads from cleaned file: {total_leads}")
 
         # Calculate the cost per lead
         cost_per_lead: float = calculate_cost_per_lead(total_leads, spend)
