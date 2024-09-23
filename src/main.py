@@ -1,70 +1,71 @@
 import csv
-from collections import defaultdict
 
 
-def remove_test_entries(file_path: str) -> str:
+def remove_test_entries(rows: list[dict]) -> list[dict]:
     """
-    Remove entries where the 'Name' or 'Email' fields contain the word 'test' (case-insensitive), and write to a new CSV.
+    Remove entries where the 'Name' or 'Email' fields contain the word 'test' (case-insensitive).
 
-    :param file_path: The path to the original CSV file.
-    :return: The path to the cleaned CSV file.
+    :param rows: List of rows from the CSV file.
+    :return: List of rows without 'test' in 'Name' or 'Email'.
     """
-    output_file_path = f"cleaned_{file_path}"
-
-    # Open the file with utf-8-sig encoding to handle and remove BOM
-    with open(file_path, mode="r", newline="", encoding="utf-8-sig") as file:
-        reader = csv.DictReader(file)
-        fieldnames = reader.fieldnames
-        rows_to_write = []
-
-        for row in reader:
-            name = row.get("Name", "").lower()
-            email = row.get("Email", "").lower()
-            # Check if 'test' is in 'Name' or 'Email' fields
-            if "test" not in name and "test" not in email:
-                rows_to_write.append(row)
-
-    # Open the output file with utf-8-sig encoding to ensure BOM is handled correctly
-    with open(output_file_path, mode="w", newline="", encoding="utf-8-sig") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
-        writer.writeheader()
-        # Write rows that do not contain 'test' in 'Name' or 'Email'
-        for row in rows_to_write:
-            writer.writerow(row)
-
-    return output_file_path
+    cleaned_rows = []
+    for row in rows:
+        name = row.get("Name", "").lower()
+        email = row.get("Email", "").lower()
+        # Check if 'test' is in 'Name' or 'Email' fields
+        if "test" not in name and "test" not in email:
+            cleaned_rows.append(row)
+    return cleaned_rows
 
 
-def dedupe_csv(file_path: str) -> str:
+def dedupe_csv(rows: list[dict]) -> list[dict]:
     """
-    Remove duplicates based on phone number or email, and write to a new CSV.
+    Remove duplicates based on phone number or email.
 
-    :param file_path: The path to the original CSV file.
-    :return: The path to the deduped CSV file.
+    :param rows: List of rows from the CSV file.
+    :return: List of unique rows based on email or phone number.
     """
     unique_emails = {}
     unique_phones = {}
-    output_file_path = f"deduped_{file_path}"
+    deduped_rows = []
+
+    for row in rows:
+        email = row.get("Email")
+        phone = row.get("Phone Number")
+        # Check for uniqueness based on email or phone number
+        if email not in unique_emails and phone not in unique_phones:
+            unique_emails[email] = row
+            unique_phones[phone] = row
+            deduped_rows.append(row)
+
+    return deduped_rows
+
+
+def clean_csv(file_path: str) -> str:
+    """
+    Clean the CSV by removing test entries and duplicates, and write to a new CSV.
+
+    :param file_path: The path to the original CSV file.
+    :return: The path to the cleaned and deduped CSV file.
+    """
+    output_file_path = f"cleaned_deduped_{file_path}"
 
     # Open the file with utf-8-sig encoding to handle and remove BOM
     with open(file_path, mode="r", newline="", encoding="utf-8-sig") as file:
         reader = csv.DictReader(file)
         fieldnames = reader.fieldnames
-        for row in reader:
-            email = row.get("Email")
-            phone = row.get("Phone Number")
-            # Check for uniqueness based on email or phone number
-            if email not in unique_emails and phone not in unique_phones:
-                unique_emails[email] = row
-                unique_phones[phone] = row
+        rows = list(reader)
+
+    # Apply cleaning functions
+    rows = remove_test_entries(rows)
+    rows = dedupe_csv(rows)
 
     # Open the output file with utf-8-sig encoding to ensure BOM is handled correctly
     with open(output_file_path, mode="w", newline="", encoding="utf-8-sig") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
         writer.writeheader()
-        # Write unique entries based on email
-        for entry in unique_emails.values():
-            writer.writerow(entry)
+        for row in rows:
+            writer.writerow(row)
 
     return output_file_path
 
@@ -99,16 +100,14 @@ def calculate_lead_metrics(
 
 
 if __name__ == "__main__":
-    # Example usage for removing test entries, deduping, and getting total leads from deduped CSV
+    # Example usage for cleaning CSV and getting total leads from cleaned CSV
     file_path: str = "test copy.csv"
-    cleaned_file_path: str = remove_test_entries(file_path)
-    deduped_file_path: str = dedupe_csv(cleaned_file_path)
-    total_leads: int = get_total_leads_from_csv(deduped_file_path)
-    print(f"Total Leads from deduped file: {total_leads}")
+    cleaned_file_path: str = clean_csv(file_path)
+    total_leads: int = get_total_leads_from_csv(cleaned_file_path)
+    print(f"Total Leads from cleaned file: {total_leads}")
 
     # Example usage for calculate_lead_metrics
     total_spend: float
-    total_leads: int
     cost_per_lead: float
 
     total_spend, total_leads, cost_per_lead = calculate_lead_metrics(
