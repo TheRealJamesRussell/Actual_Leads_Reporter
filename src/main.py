@@ -105,28 +105,31 @@ def calculate_cost_per_lead(total_leads: int, total_spend: float) -> float:
 @click.command()
 @click.option("-c","--csv-path", type=click.Path(exists=True), required=True, help="Path to the CSV file.")
 @click.option("-s","--spend", type=float, required=True, help="Total amount of money spent.")
-def main(file_path: str, total_spend: float):
+def main(csv_path: str, spend: float):
     """
     CLI tool to process a CSV file, clean it, and calculate cost per lead. 
     Use the --file-path flag to specify the path to the CSV file and the --total-spend flag to specify the total spend amount.
     """
     try:
         # Clean the CSV file by removing test entries and deduping, and get the path to the cleaned file
-        cleaned_file_path: str = clean_csv(file_path)
+        cleaned_file_path: str = clean_csv(csv_path)
 
         # Get the total number of leads from the cleaned CSV file
         total_leads: int = get_total_leads_from_csv(cleaned_file_path)
         click.echo(f"Total Leads from cleaned file: {total_leads}")
 
         # Calculate the cost per lead
-        cost_per_lead: float = calculate_cost_per_lead(total_leads, total_spend)
+        cost_per_lead: float = calculate_cost_per_lead(total_leads, spend)
 
         # Print the total spend, total leads, and cost per lead
         click.echo(
-            f"Total Spend: {total_spend}, Total Leads: {total_leads}, Cost per Lead: {cost_per_lead}"
+            f"Total Spend: {spend}, Total Leads: {total_leads}, Cost per Lead: {cost_per_lead}"
         )
     except FileNotFoundError:
-        click.echo(f"Error: The file {file_path} was not found.", err=True)
+        click.echo(f"Error: The file {csv_path} was not found.", err=True)
+
+if __name__ == '__main__':
+    main()
 
 
 if __name__ == "__main__":
