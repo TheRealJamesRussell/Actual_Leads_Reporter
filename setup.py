@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+from pathlib import Path  # Import Path from pathlib
 
 setup(
     name="Actual_Leads_Reporter",
