@@ -3,12 +3,11 @@ from pathlib import Path  # Import Path from pathlib
 
 setup(
     name="Actual_Leads_Reporter",
-    version="0.2.0",
-    packages=find_packages(where="src"),
-    package_dir={"": "src"},
+    version="1.0.0",
+    packages=find_packages(),
     entry_points={
         "console_scripts": [
-            "leads=main:main",
+            "leads=src.main:main",
         ],
     },
     install_requires=[
