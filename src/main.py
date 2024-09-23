@@ -85,35 +85,36 @@ def get_total_leads_from_csv(file_path: str) -> int:
     return total_leads
 
 
-def calculate_lead_metrics(
-    total_leads: int, total_spend: float
-) -> tuple[float, int, float]:
+def calculate_cost_per_lead(total_leads: int, total_spend: float) -> float:
     """
-    Calculate and return the total spend, total leads, and cost per lead.
+    Calculate and return the cost per lead.
 
     :param total_leads: The number of leads generated.
     :param total_spend: The total amount of money spent.
-    :return: A tuple containing total spend, total leads, and cost per lead.
+    :return: The cost per lead.
     """
     cost_per_lead = total_spend / total_leads if total_leads != 0 else 0.0
-    return total_spend, total_leads, cost_per_lead
+    return cost_per_lead
 
 
 if __name__ == "__main__":
-    # Example usage for cleaning CSV and getting total leads from cleaned CSV
+    # Define the path to the CSV file
     file_path: str = "test copy.csv"
+    
+    # Clean the CSV file by removing test entries and deduping, and get the path to the cleaned file
     cleaned_file_path: str = clean_csv(file_path)
+    
+    # Get the total number of leads from the cleaned CSV file
     total_leads: int = get_total_leads_from_csv(cleaned_file_path)
     print(f"Total Leads from cleaned file: {total_leads}")
 
-    # Example usage for calculate_lead_metrics
-    total_spend: float
-    cost_per_lead: float
+    # Define the total spend amount
+    total_spend: float = 911.26
+    
+    # Calculate the cost per lead
+    cost_per_lead: float = calculate_cost_per_lead(total_leads, total_spend)
 
-    total_spend, total_leads, cost_per_lead = calculate_lead_metrics(
-        total_leads, 911.26
-    )
-
+    # Print the total spend, total leads, and cost per lead
     print(
         f"Total Spend: {total_spend}, Total Leads: {total_leads}, Cost per Lead: {cost_per_lead}"
     )
