@@ -2,6 +2,39 @@ import csv
 from collections import defaultdict
 
 
+def remove_test_entries(file_path: str) -> str:
+    """
+    Remove entries where the 'Name' or 'Email' fields contain the word 'test' (case-insensitive), and write to a new CSV.
+
+    :param file_path: The path to the original CSV file.
+    :return: The path to the cleaned CSV file.
+    """
+    output_file_path = f"cleaned_{file_path}"
+
+    # Open the file with utf-8-sig encoding to handle and remove BOM
+    with open(file_path, mode="r", newline="", encoding="utf-8-sig") as file:
+        reader = csv.DictReader(file)
+        fieldnames = reader.fieldnames
+        rows_to_write = []
+
+        for row in reader:
+            name = row.get("Name", "").lower()
+            email = row.get("Email", "").lower()
+            # Check if 'test' is in 'Name' or 'Email' fields
+            if "test" not in name and "test" not in email:
+                rows_to_write.append(row)
+
+    # Open the output file with utf-8-sig encoding to ensure BOM is handled correctly
+    with open(output_file_path, mode="w", newline="", encoding="utf-8-sig") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+        writer.writeheader()
+        # Write rows that do not contain 'test' in 'Name' or 'Email'
+        for row in rows_to_write:
+            writer.writerow(row)
+
+    return output_file_path
+
+
 def dedupe_csv(file_path: str) -> str:
     """
     Remove duplicates based on phone number or email, and write to a new CSV.
@@ -66,10 +99,11 @@ def calculate_lead_metrics(
 
 
 if __name__ == "__main__":
-    # Example usage for deduping and getting total leads from deduped CSV
-    file_path : str = "test copy.csv"
-    deduped_file_path : str = dedupe_csv(file_path)
-    total_leads : int = get_total_leads_from_csv(deduped_file_path)
+    # Example usage for removing test entries, deduping, and getting total leads from deduped CSV
+    file_path: str = "test copy.csv"
+    cleaned_file_path: str = remove_test_entries(file_path)
+    deduped_file_path: str = dedupe_csv(cleaned_file_path)
+    total_leads: int = get_total_leads_from_csv(deduped_file_path)
     print(f"Total Leads from deduped file: {total_leads}")
 
     # Example usage for calculate_lead_metrics
