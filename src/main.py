@@ -1,4 +1,6 @@
 import csv
+import click
+import os
 
 
 def remove_test_entries(rows: list[dict]) -> list[dict]:
@@ -97,24 +99,33 @@ def calculate_cost_per_lead(total_leads: int, total_spend: float) -> float:
     return cost_per_lead
 
 
+@click.command()
+@click.argument("file_path", type=click.Path(exists=True))
+def main(file_path: str):
+    """
+    CLI tool to process a CSV file, clean it, and calculate cost per lead. Pass in the path to the CSV file as an argument.
+    """
+    try:
+        # Clean the CSV file by removing test entries and deduping, and get the path to the cleaned file
+        cleaned_file_path: str = clean_csv(file_path)
+
+        # Get the total number of leads from the cleaned CSV file
+        total_leads: int = get_total_leads_from_csv(cleaned_file_path)
+        click.echo(f"Total Leads from cleaned file: {total_leads}")
+
+        # Define the total spend amount
+        total_spend: float = 911.26
+
+        # Calculate the cost per lead
+        cost_per_lead: float = calculate_cost_per_lead(total_leads, total_spend)
+
+        # Print the total spend, total leads, and cost per lead
+        click.echo(
+            f"Total Spend: {total_spend}, Total Leads: {total_leads}, Cost per Lead: {cost_per_lead}"
+        )
+    except FileNotFoundError:
+        click.echo(f"Error: The file {file_path} was not found.", err=True)
+
+
 if __name__ == "__main__":
-    # Define the path to the CSV file
-    file_path: str = "test copy.csv"
-    
-    # Clean the CSV file by removing test entries and deduping, and get the path to the cleaned file
-    cleaned_file_path: str = clean_csv(file_path)
-    
-    # Get the total number of leads from the cleaned CSV file
-    total_leads: int = get_total_leads_from_csv(cleaned_file_path)
-    print(f"Total Leads from cleaned file: {total_leads}")
-
-    # Define the total spend amount
-    total_spend: float = 911.26
-    
-    # Calculate the cost per lead
-    cost_per_lead: float = calculate_cost_per_lead(total_leads, total_spend)
-
-    # Print the total spend, total leads, and cost per lead
-    print(
-        f"Total Spend: {total_spend}, Total Leads: {total_leads}, Cost per Lead: {cost_per_lead}"
-    )
+    main()
